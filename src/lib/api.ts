@@ -50,6 +50,8 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+export { api };
+
 export const invoiceApi = {
   async createInvoice(invoice: Invoice) {
     const response = await api.post('/invoices', invoice);
