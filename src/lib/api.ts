@@ -68,6 +68,11 @@ export const invoiceApi = {
     return response.data;
   },
 
+  async getInvoiceItems(invoiceId: string) {
+    const response = await api.get(`/invoices/${invoiceId}/items`);
+    return response.data;
+  },
+
   async updateInvoice(id: string, invoice: Invoice) {
     const response = await api.put(`/invoices/${id}`, invoice);
     return response.data;
