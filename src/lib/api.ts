@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { supabase } from './supabase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -31,80 +32,47 @@ export interface Invoice {
   created_at?: string;
 }
 
-export const api = {
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add request interceptor to include auth token
+api.interceptors.request.use(async (config) => {
+  const token = (await supabase.auth.getSession()).data.session?.access_token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const invoiceApi = {
   async createInvoice(invoice: Invoice) {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/invoices`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: JSON.stringify(invoice),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erreur lors de la création de la facture');
-    }
-    
-    return response.json();
+    const response = await api.post('/invoices', invoice);
+    return response.data;
   },
 
   async getInvoices() {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/invoices`, {
-      headers,
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération des factures');
-    }
-    
-    return response.json();
+    const response = await api.get('/invoices');
+    return response.data;
   },
 
   async getInvoice(id: string) {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/invoices/${id}`, {
-      headers,
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération de la facture');
-    }
-    
-    return response.json();
+    const response = await api.get(`/invoices/${id}`);
+    return response.data;
   },
 
   async updateInvoice(id: string, invoice: Invoice) {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/invoices/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: JSON.stringify(invoice),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erreur lors de la modification de la facture');
-    }
-    
-    return response.json();
+    const response = await api.put(`/invoices/${id}`, invoice);
+    return response.data;
   },
 
   async deleteInvoice(id: string) {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/invoices/${id}`, {
-      method: 'DELETE',
-      headers,
-    });
-    
-    if (!response.ok) {
-      throw new Error('Erreur lors de la suppression de la facture');
-    }
-    
-    return response.json();
+    const response = await api.delete(`/invoices/${id}`);
+    return response.data;
   },
 };
