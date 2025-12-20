@@ -25,7 +25,7 @@ export default function AdminLogin() {
 
       // Vérifier si l'utilisateur est admin via le backend
       const token = authData.session.access_token;
-      const response = await fetch('http://localhost:3001/auth/me', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
