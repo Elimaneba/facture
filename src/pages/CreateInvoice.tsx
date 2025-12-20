@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Plus, Trash2, ArrowLeft } from 'lucide-react';
-import { api, InvoiceItem } from '../lib/api';
+import { invoiceApi, InvoiceItem } from '../lib/api';
 import { generateInvoicePDF } from '../lib/pdfGenerator';
 import { useOrganization } from '../contexts/OrganizationContext';
 
@@ -52,7 +52,7 @@ export default function CreateInvoice() {
     setLoading(true);
 
     try {
-      await api.createInvoice({
+      await invoiceApi.createInvoice({
         organization_id: currentOrganization.id,
         type: type as 'definitive' | 'proforma',
         vat_rate: vatRate,
