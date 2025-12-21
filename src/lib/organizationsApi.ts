@@ -73,24 +73,55 @@ export interface UpdateOrganizationSettingsData {
 }
 
 export const organizationsApi = {
-  async createOrganization(data: CreateOrganizationData) {
-    const headers = await getAuthHeader();
-    const response = await fetch(`${API_URL}/organizations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: JSON.stringify(data),
-    });
+  // async createOrganization(data: CreateOrganizationData) {
+  //   const headers = await getAuthHeader();
+  //   const response = await fetch(`${API_URL}/organizations`,
+  //      {
+         
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...headers,
+  //     },
+  //     body: JSON.stringify(data),
+  //   });
     
-    if (!response.ok) {
-      throw new Error('Erreur lors de la création de l\'organisation');
-    }
+  //   if (!response.ok) {
+  //     throw new Error('Erreur lors de la création de l\'organisation');
+  //   }
     
-    return response.json();
-  },
+  //   return response.json();
+  // },
+async createOrganization(data: CreateOrganizationData) {
+    try {
+      const headers = await getAuthHeader();
+      console.log('En-têtes de la requête:', headers);
+      
+      const response = await fetch(`${API_URL}/organizations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(data),
+      });
+      
+      const responseText = await response.text();
+      console.log('Réponse brute:', responseText);
+      
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}\n${responseText}`);
+      }
+      
+      return JSON.parse(responseText);
+    } catch (error) {
+      console.error('Erreur détaillée:', {
+        error,
 
+      });
+      throw error;
+    }
+  },
   async getUserOrganizations(): Promise<Organization[]> {
     const headers = await getAuthHeader();
     const response = await fetch(`${API_URL}/organizations`, {
