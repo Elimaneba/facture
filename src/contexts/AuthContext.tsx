@@ -28,11 +28,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session) {
         // Vérifier que la session est encore valide côté serveur
         try {
-          const response = await fetch(`${API_URL}/auth/me`, {
+          const url = `${API_URL}/auth/me`;
+          console.log('🔄 Vérification session - URL:', url);
+          
+          const response = await fetch(url, {
             headers: {
               Authorization: `Bearer ${session.access_token}`,
             },
           });
+          
+          const text = await response.text();
+          console.log('📡 Vérification session - Status:', response.status);
+          console.log('📄 Vérification session - Response:', text.substring(0, 200));
           
           if (!response.ok) {
             console.log('❌ Session invalide, déconnexion...');
@@ -86,18 +93,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error('Session invalide');
     }
 
-    const response = await fetch(`${API_URL}/auth/me`, {
+    const url = `${API_URL}/auth/me`;
+    console.log('🔄 Auth API URL:', url);
+    
+    const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
+    const responseText = await response.text();
+    console.log('📡 Auth Status:', response.status);
+    console.log('📄 Auth Response:', responseText.substring(0, 300));
+
     if (!response.ok) {
       await supabase.auth.signOut();
-      throw new Error('Erreur lors de la vérification du compte');
+      throw new Error(`Erreur ${response.status}: ${responseText.substring(0, 100)}`);
     }
 
-    const userData = await response.json();
+    const userData = JSON.parse(responseText);
     if (userData?.is_admin) {
       await supabase.auth.signOut();
       throw new Error('Email ou mot de passe incorrect');

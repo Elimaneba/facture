@@ -123,29 +123,22 @@ async createOrganization(data: CreateOrganizationData) {
     }
   },
   async getUserOrganizations(): Promise<Organization[]> {
-    try {
-      const headers = await getAuthHeader();
-      console.log('🔍 Fetching organizations from:', `${API_URL}/organizations`);
-      console.log('Request headers:', headers);
-      
-      const response = await fetch(`${API_URL}/organizations`, {
-        headers,
-        credentials: 'include' // Important for cookies if using session-based auth
-      });
-      
-      const responseText = await response.text();
-      console.log('📥 Raw response:', responseText);
-      
-      if (!response.ok) {
-        console.error('❌ Error response status:', response.status, response.statusText);
-        throw new Error(`Erreur lors de la récupération des organisations: ${response.status} ${response.statusText}`);
-      }
-      
-      return JSON.parse(responseText);
-    } catch (error) {
-      console.error('❌ Error in getUserOrganizations:', error);
-      throw error;
+    const headers = await getAuthHeader();
+    const url = `${API_URL}/organizations`;
+    console.log('🔄 API URL:', url);
+    console.log('🔑 Headers:', headers);
+    
+    const response = await fetch(url, { headers });
+    const text = await response.text();
+    
+    console.log('📡 Status:', response.status);
+    console.log('📄 Response:', text.substring(0, 300));
+    
+    if (!response.ok) {
+      throw new Error(`Erreur ${response.status}: ${text.substring(0, 100)}`);
     }
+    
+    return JSON.parse(text);
   },
 
   async getOrganization(id: string) {
