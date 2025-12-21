@@ -6,7 +6,7 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
   return data.session?.access_token
     ? { Authorization: `Bearer ${data.session.access_token}` }
-    : {} as Record<string, string>;
+    : {};// as Record<string, string>;
 }
 
 export interface InvoiceItem {
@@ -43,10 +43,16 @@ export const api = {
       body: JSON.stringify(invoice),
     });
     
-    if (!response.ok) {
-      throw new Error('Erreur lors de la création de la facture');
+  if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Erreur API:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        response: errorText
+      });
+      throw new Error(`Erreur ${response.status}: ${errorText.substring(0, 100)}...`);
     }
-    
     return response.json();
   },
 

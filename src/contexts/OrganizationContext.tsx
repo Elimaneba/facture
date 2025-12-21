@@ -58,8 +58,8 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
         console.warn('⚠️ Aucune organisation disponible');
       }
     } catch (error: any) {
-   //   console.error('❌ Erreur chargement organisations:', error);
-    //  console.error('Détails:', error.message);
+      console.error('❌ Erreur chargement organisations:', error);
+     console.error('Détails:', error.message);
     } finally {
       setLoading(false);
     }
