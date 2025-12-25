@@ -125,15 +125,28 @@ export async function generateInvoicePDF(
   // Table des articles
   const tableStartY = invoice.client_name ? clientY + 25 : clientY;
 
+  // Préparer les lignes du tableau
+  const tableBody = invoice.items.map((item) => [
+    item.designation,
+    item.quantity.toString(),
+    `${item.unit_price.toFixed(0)} FCFA`,
+    `${(item.quantity * item.unit_price).toFixed(0)} FCFA`,
+  ]);
+
+  // Ajouter la ligne main d'oeuvre si présente
+  if (invoice.labor_cost && invoice.labor_cost > 0) {
+    tableBody.push([
+      "Main d'oeuvre",
+      '-',
+      '-',
+      `${invoice.labor_cost.toFixed(0)} FCFA`,
+    ]);
+  }
+
   autoTable(doc, {
     startY: tableStartY,
     head: [['Désignation', 'Quantité', 'Prix unitaire', 'Total']],
-    body: invoice.items.map((item) => [
-      item.designation,
-      item.quantity.toString(),
-      `${item.unit_price.toFixed(0)} FCFA`,
-      `${(item.quantity * item.unit_price).toFixed(0)} FCFA`,
-    ]),
+    body: tableBody,
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
   });
@@ -243,15 +256,28 @@ export async function printInvoice(
   // Table des articles
   const tableStartY = invoice.client_name ? clientY + 25 : clientY;
 
+  // Préparer les lignes du tableau
+  const printTableBody = invoice.items.map((item) => [
+    item.designation,
+    item.quantity.toString(),
+    `${item.unit_price.toFixed(0)} FCFA`,
+    `${(item.quantity * item.unit_price).toFixed(0)} FCFA`,
+  ]);
+
+  // Ajouter la ligne main d'oeuvre si présente
+  if (invoice.labor_cost && invoice.labor_cost > 0) {
+    printTableBody.push([
+      "Main d'oeuvre",
+      '-',
+      '-',
+      `${invoice.labor_cost.toFixed(0)} FCFA`,
+    ]);
+  }
+
   autoTable(doc, {
     startY: tableStartY,
     head: [['Désignation', 'Quantité', 'Prix unitaire', 'Total']],
-    body: invoice.items.map((item) => [
-      item.designation,
-      item.quantity.toString(),
-      `${item.unit_price.toFixed(0)} FCFA`,
-      `${(item.quantity * item.unit_price).toFixed(0)} FCFA`,
-    ]),
+    body: printTableBody,
     theme: 'striped',
     headStyles: { fillColor: [41, 128, 185] },
   });

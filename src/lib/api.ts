@@ -29,6 +29,7 @@ export interface Invoice {
   total_vat?: number;
   total_ttc?: number;
   created_at?: string;
+  labor_cost?: number;
 }
 
 export const api = {

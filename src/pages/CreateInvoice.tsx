@@ -18,6 +18,7 @@ export default function CreateInvoice() {
   const [clientAddress, setClientAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [laborCost, setLaborCost] = useState(0);
 
   const addItem = () => {
     setItems([...items, { designation: '', quantity: 1, unit_price: 0 }]);
@@ -34,7 +35,8 @@ export default function CreateInvoice() {
   };
 
   const calculateTotals = () => {
-    const total_ht = items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+    const itemsTotal = items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+    const total_ht = itemsTotal + laborCost;
     const total_vat = total_ht * (vatRate / 100);
     const total_ttc = total_ht + total_vat;
     return { total_ht, total_vat, total_ttc };
@@ -59,6 +61,7 @@ export default function CreateInvoice() {
         items,
         client_name: clientName || undefined,
         client_address: clientAddress || undefined,
+        labor_cost: laborCost > 0 ? laborCost : undefined,
       });
 
       navigate('/invoices');
@@ -207,12 +210,42 @@ export default function CreateInvoice() {
               </div>
             </div>
 
+            {/* Main d'oeuvre */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Main d'oeuvre
+                  </label>
+                  <p className="text-xs text-gray-500">Montant forfaitaire (optionnel)</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="number"
+                    value={laborCost}
+                    onChange={(e) => setLaborCost(Number(e.target.value))}
+                    min="0"
+                    step="1"
+                    className="w-40 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Montant"
+                  />
+                  <span className="text-gray-600 font-medium">FCFA</span>
+                </div>
+              </div>
+            </div>
+
             <div className="border-t pt-6">
               <div className="space-y-2 max-w-xs ml-auto">
                 <div className="flex justify-between text-gray-700">
                   <span>Total HT:</span>
                   <span className="font-medium">{total_ht.toFixed(0)} FCFA</span>
                 </div>
+                {laborCost > 0 && (
+                  <div className="flex justify-between text-gray-500 text-sm">
+                    <span>(dont main d'oeuvre:</span>
+                    <span>{laborCost.toFixed(0)} FCFA)</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-700">
                   <span>TVA ({vatRate}%):</span>
                   <span className="font-medium">{total_vat.toFixed(0)} FCFA</span>
@@ -236,7 +269,7 @@ export default function CreateInvoice() {
                 disabled={loading}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Création...' : 'Créer et télécharger PDF'}
+                {loading ? 'Création...' : 'Créer la facture'}
               </button>
             </div>
           </form>
